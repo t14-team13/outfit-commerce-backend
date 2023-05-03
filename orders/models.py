@@ -10,7 +10,7 @@ class Order(models.Model):
     status = models.CharField(
         max_length=50,
         choices = OrderStatusChoices.choices,
-        default=OrderStatusChoices.IN_PROGRESS
+        default=OrderStatusChoices.ORDERS_PLACED
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)

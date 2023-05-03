@@ -17,7 +17,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "products"
         ]
 
-    def get_user_cart_products(user)
+    def get_user_cart_products(user):
         cart = Cart.objects.filter(user=user).first()
         if cart:
             return Product.objects.filter(cart=cart)
