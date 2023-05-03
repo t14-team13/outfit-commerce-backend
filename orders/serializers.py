@@ -10,7 +10,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "status",
             "created_at",
             "updated_at",
-            # "products" -> campo para listar os produtos
+            # "products" -> campo para listar os produtos?
         ]
 
         

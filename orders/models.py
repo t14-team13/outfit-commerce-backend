@@ -4,14 +4,13 @@ class OrderStatusChoices(models.TextChoices):
     ORDERS_PLACED = "Order placed"
     IN_PROGRESS = "Order in progress"
     DELIVERED = "Order delivered"
-    NOT_INFORMED = "Not informed"
 
 class Order(models.Model):
 
     status = models.CharField(
         max_length=50,
         choices = OrderStatusChoices.choices,
-        default=OrderStatusChoices.NOT_INFORMED
+        default=OrderStatusChoices.IN_PROGRESS
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
@@ -21,10 +20,3 @@ class Order(models.Model):
         on_delete= models.PROTECT,
         related_name="orders"
     )
-
-    cart = models.ForeignKey(
-        "carts.Cart",
-        on_delete.PROTECT,
-        related_name="cart_orders"
-    )
-
