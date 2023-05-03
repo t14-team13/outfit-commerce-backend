@@ -47,7 +47,7 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 ]
 MY_APPS = [
-    "adresses",
+    "addresses",
     "carts",
     "orders",
     "products",
