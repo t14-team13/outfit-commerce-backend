@@ -1,5 +1,4 @@
 from django.db import models
-import uuid
 
 class OrderStatusChoices(models.TextChoices):
     ORDERS_PLACED = "Order placed"
