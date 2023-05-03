@@ -3,8 +3,8 @@ from . import views
 
 
 urlpatterns = [
-    path("products/"),
-    path("products/<int:pk>"),
-    path("seller/products/"),
-    path("seller/products/<int:pk>"),
+    path("products/", views.ProductView.as_view()),
+    path("products/<int:pk>/", views.ProductDetailView.as_view()),
+    path("seller/products/", views.ProductSellerView.as_view()),
+    path("seller/products/<int:pk>/", views.ProductSellerDetailView.as_view()),
 ]
