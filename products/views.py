@@ -10,6 +10,7 @@ from rest_framework.generics import (
     UpdateAPIView,
     DestroyAPIView,
 )
+from ..orders.models import Order
 
 
 # retorna todos os produtos
@@ -18,8 +19,8 @@ class ProductView(ListAPIView):
     serializer_class = ProductSerializer
 
 
-# retorna um produto e adiciona um produto ao carrinho
-class ProductDetailView(RetrieveAPIView, CreateAPIView):
+# retorna um produto
+class ProductDetailView(RetrieveAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = Product.objects.all()
@@ -32,6 +33,16 @@ class ProductSellerView(ListAPIView, CreateAPIView):
     permission_classes = [IsAuthenticated, IsEmployee]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    def perform_create(self, serializer: ProductSerializer) -> None:
+        user = self.request.user
+        serializer.save(user=user)
+
+    def get_queryset(self):
+        user = self.request.user
+        seller_products = Order.objects.filter(seller_id=user.id)
+        sold_products = seller_products.filter(status="orders_placed")
+        return sold_products
 
 
 # atualiza e deleta um produto
