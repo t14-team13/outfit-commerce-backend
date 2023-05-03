@@ -3,7 +3,7 @@ from django.db import models
 
 class Product(models.Model):
     class Meta:
-        ordering = ("id")
+        ordering = "id"
 
     name = models.CharField(max_length=40)
     description = models.CharField(max_length=255)
@@ -18,9 +18,7 @@ class Product(models.Model):
     )
 
     cart = models.ManyToManyField(
-        "carts.Cart",
-        related_name="products_in_cart",
-        through="products.CartProducts"
+        "carts.Cart", related_name="products_in_cart", through="products.CartProducts"
     )
 
 
@@ -32,7 +30,5 @@ class CartProducts(models.Model):
     )
 
     cart = models.ForeignKey(
-        "carts.Cart",
-        on_delete=models.CASCADE,
-        related_name="current_cart"
+        "carts.Cart", on_delete=models.CASCADE, related_name="current_cart"
     )
