@@ -38,7 +38,7 @@ class ProductSellerView(ListAPIView, CreateAPIView):
         user = self.request.user
         serializer.save(user=user)
 
-    # em progresso, aguardando erro na migration de ProductsOrder
+    # Aguardando as outras rotas para fazer os testes
     def get_queryset(self):
         sold_products = []
         user = self.request.user
