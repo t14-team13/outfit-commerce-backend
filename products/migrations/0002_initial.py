@@ -6,6 +6,7 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
+
     initial = True
 
     dependencies = [
@@ -16,30 +17,18 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name="product",
-            name="user",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="products_added",
-                to=settings.AUTH_USER_MODEL,
-            ),
+            model_name='product',
+            name='user',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='products_added', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
-            model_name="cartproducts",
-            name="cart",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="current_cart",
-                to="carts.cart",
-            ),
+            model_name='cartproducts',
+            name='cart',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='current_cart', to='carts.cart'),
         ),
         migrations.AddField(
-            model_name="cartproducts",
-            name="product",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="cart_products",
-                to="products.product",
-            ),
+            model_name='cartproducts',
+            name='product',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='cart_products', to='products.product'),
         ),
     ]
