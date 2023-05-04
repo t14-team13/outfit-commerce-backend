@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.core.mail import send_email
+from django.core.mail import send_mail
 
 from .models import Order
 from carts.models import Cart
@@ -26,10 +26,11 @@ class OrderSerializer(serializers.ModelSerializer):
         else:
             return []
 
-    def send_email(self, order):
+    @staticmethod
+    def send_email(order):
         send_mail(
             "Order Status Updated",
-            f"The status of your order {order.id} has been updated to {order.status}."
+            f"The status of your order {order.id} has been updated to {order.status}.",
             settings.EMAIL_HOST,
             [order.user.email],
             fail_silently=False,
