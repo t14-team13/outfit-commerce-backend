@@ -20,3 +20,8 @@ class Order(models.Model):
         on_delete= models.PROTECT,
         related_name="orders"
     )
+
+    products = models.ManyToManyField(
+        "products.Product",
+        related_name="orders"
+    )

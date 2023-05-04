@@ -30,9 +30,13 @@ class OrderDetailView(generics.UpdateAPIView):
 
     def patch(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True))
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save(status=request.data.get('status'))
+
+        updated_instance = serializer.update(instance, request.data)
+
+        if updated_instance.status != instance.status:
+            serializer.send_email(updated_instance)
 
         return Response(serializer.data)
       
