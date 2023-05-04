@@ -1,7 +1,13 @@
 from rest_framework import serializers
 from .models import Address
+from django.shortcuts import get_object_or_404
 
 class AddressSerializer(serializers.ModelSerializer):
+
+    def validate(self, attrs):
+        user = self.context["request"].user
+        if user.address:
+            raise serializers.ValidationError('The user already has an address.')
 
     def create(self, validated_data):
         return super().create(validated_data)
