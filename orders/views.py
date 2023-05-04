@@ -1,11 +1,11 @@
 from rest_framework import generics
-from rest_framework_simplejwt.authenticarion import JWTAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
 from .models import Order
 from .serializers import OrderSerializer
-from ..permissions import IsEmployee
+from permissions import IsEmployee
 
 
 #Lista os produtos do pedido
@@ -36,7 +36,7 @@ class OrderDetailView(generics.UpdateAPIView):
         updated_instance = serializer.update(instance, request.data)
 
         if updated_instance.status != instance.status:
-            serializer.send_email(updated_instance)
+            serializer.send_mail(updated_instance)
 
         return Response(serializer.data)
       

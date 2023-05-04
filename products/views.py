@@ -2,7 +2,7 @@ from .models import Product
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .serializers import ProductSerializer
-from ..permissions import IsEmployee
+from permissions import IsEmployee
 from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
@@ -10,7 +10,7 @@ from rest_framework.generics import (
     UpdateAPIView,
     DestroyAPIView,
 )
-from ..orders.models import Order
+from orders.models import Order
 
 
 # retorna todos os produtos

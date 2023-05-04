@@ -23,5 +23,19 @@ class Order(models.Model):
 
     products = models.ManyToManyField(
         "products.Product",
-        related_name="orders"
+        related_name="orders",
+        through="orders.ProductsOrder"
+    )
+
+class ProductsOrder(models.Model):
+    product = models.ForeignKey(
+        "products.Product",
+        on_delete=models.CASCADE,
+        related_name="order_products",
+    )
+
+    order = models.ForeignKey(
+        "orders.Order",
+        on_delete=models.CASCADE,
+        related_name="my_order"
     )
