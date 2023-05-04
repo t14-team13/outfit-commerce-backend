@@ -10,7 +10,7 @@ from rest_framework.generics import (
     UpdateAPIView,
     DestroyAPIView,
 )
-from orders.models import Order
+from orders.models import ProductsOrder
 
 
 # retorna todos os produtos
@@ -38,10 +38,15 @@ class ProductSellerView(ListAPIView, CreateAPIView):
         user = self.request.user
         serializer.save(user=user)
 
+    # Aguardando as outras rotas para fazer os testes
     def get_queryset(self):
+        sold_products = []
         user = self.request.user
-        seller_products = Order.objects.filter(seller_id=user.id)
-        sold_products = seller_products.filter(status="orders_placed")
+        order_products = ProductsOrder.objects.all()
+        for item in order_products:
+            if item.product.user_id == user.id:
+                sold_products.append(item)
+
         return sold_products
 
 
