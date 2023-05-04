@@ -24,7 +24,7 @@ class Order(models.Model):
     products = models.ManyToManyField(
         "products.Product",
         related_name="orders",
-        through="orders.ProductsOrder"
+        through="ProductsOrder"
     )
 
 class ProductsOrder(models.Model):
