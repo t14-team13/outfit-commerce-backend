@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from .models import User
 from addresses.serializers import AddressSerializer
+from carts.serializers import CartSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -18,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
     address = AddressSerializer(read_only=True)
+    cart = CartSerializer(read_only=True)
 
     class Meta:
         model = User
@@ -31,6 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_employee",
             "is_superuser",
             "address",
+            "cart",
         ]
 
         extra_kwargs = {
