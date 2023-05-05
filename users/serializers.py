@@ -3,6 +3,7 @@ from rest_framework.validators import UniqueValidator
 from .models import User
 from addresses.serializers import AddressSerializer
 from carts.serializers import CartSerializer
+from carts.models import Cart
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -47,7 +48,5 @@ class UserSerializer(serializers.ModelSerializer):
                     )
                 ]
             },
-            "email": {
-                "validators": [UniqueValidator(queryset=User.objects.all())]
-            },
+            "email": {"validators": [UniqueValidator(queryset=User.objects.all())]},
         }
