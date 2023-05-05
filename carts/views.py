@@ -19,9 +19,12 @@ class CartView(ListAPIView):
 
     def get_queryset(self):
         cart = Cart.objects.get(user_id=self.request.user.id)
-        cart_products = CartProducts.objects.get(cart_id=cart.id, many=True)
+        cart_products = CartProducts.objects.get(cart_id=cart.id)
 
         return cart_products
+    
+    def get_serializer_class(self):
+        return CartReturnSerializer(many=True)
 
 
 class CartDetailView(CreateAPIView):
@@ -44,9 +47,9 @@ class CartCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        cart_exist = Cart.objects.get(user=self.request.user)
+        cart_exist = Cart.objects.get_or_create(user=self.request.user)
 
         if not cart_exist:
             return serializer.save(user=self.request.user)
-
+    
         raise ValidationError({"error": "User cart already exists"})

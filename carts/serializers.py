@@ -5,6 +5,18 @@ from rest_framework.validators import UniqueValidator
 
 
 class CartSerializer(serializers.ModelSerializer):
+    amount = serializers.SerializerMethodField()
+    total_price = serializers.SerializerMethodField()
+
+    def get_amount(self, obj):
+        itens = Product.objects.filter(cart=obj)
+        amount = 0
+
+        for i, value in enumerate(itens):
+            amount +=1
+
+        return amount
+
     class Meta:
         model = Cart
         fields = ("id", "amount", "total_price", "user_id")
@@ -13,6 +25,7 @@ class CartSerializer(serializers.ModelSerializer):
 
 # Mudar para o product serializer
 class ProductReturnSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Product
         fields = ("id", "name", "price")
@@ -28,7 +41,6 @@ class CartReturnSerializer(serializers.ModelSerializer):
             "cart_id": {"read_only": True},
             "products_list": {"read_only": True},
         }
-        # depth = 1
 
     def create(self, validated_data):
         return super().create(validated_data)
