@@ -3,7 +3,6 @@ from .models import Product, CartProducts
 
 
 class ProductSerializer(serializers.ModelSerializer):
-
     available = serializers.SerializerMethodField()
 
     def get_available(self, obj):
@@ -22,7 +21,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "category",
             "stock",
             "user_id",
-            "available"
+            "available",
         ]
 
         extra_kwargs = {
