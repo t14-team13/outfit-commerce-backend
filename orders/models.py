@@ -27,6 +27,14 @@ class Order(models.Model):
         through="ProductsOrder"
     )
 
+    cart = models.ForeignKey(
+        "carts.Cart", 
+        on_delete=models.PROTECT, 
+        related_name="cart_orders",
+        null= True
+    )
+
+
 class ProductsOrder(models.Model):
     product = models.ForeignKey(
         "products.Product",
