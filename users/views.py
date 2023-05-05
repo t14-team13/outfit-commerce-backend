@@ -18,10 +18,6 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAdminUser]
 
-    def update(self, request, *args, **kwargs):
-        print(self.request.build_absolute_uri)
-        return super().update(request, *args, **kwargs)
-
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_url_kwarg = "pk"
@@ -30,6 +26,7 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 class UserProfileView(generics.ListAPIView, generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    
     serializer_class = UserSerializer
     pagination_class = None
 
