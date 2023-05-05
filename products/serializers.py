@@ -40,12 +40,20 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class CartProductsSerializer(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField()
+
+    def get_products(self, obj):
+        itens = Product.objects.filter(cart=obj.cart)
+
+        serializer = ProductSerializer(itens, many=True, partial=True)
+        return serializer.data
+
     class Meta:
         model = CartProducts
 
-        fields = ["product_id", "cart_id"]
+        fields = ("cart_id", "products")
 
         extra_kwargs = {
-            "product_id": {"read_only": True},
             "cart_id": {"read_only": True},
+            "products": {"read_only": True},
         }

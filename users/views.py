@@ -26,7 +26,7 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 class UserProfileView(generics.ListAPIView, generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    
+
     serializer_class = UserSerializer
     pagination_class = None
 
