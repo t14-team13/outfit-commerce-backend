@@ -1,12 +1,16 @@
 from rest_framework import permissions
-from rest_framework.views import View
+from rest_framework.views import View, Request
 from users.models import User
+from products.models import Product
 
 
 class IsEmployee(permissions.BasePermission):
     def has_permission(self, request, view: View) -> bool:
         return request.user.is_employee
 
+class isProductOwner(permissions.BasePermission) -> bool:
+    def has_object_permission(self, request: Request, view: View, obj: Product):
+        return obj.user == request.user
 
 class IsAdminOrPostOnly(permissions.BasePermission):
     def has_permission(self, request, view):

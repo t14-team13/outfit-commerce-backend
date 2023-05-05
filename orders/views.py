@@ -1,12 +1,37 @@
 from rest_framework import generics
+from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
-from .models import Order
+from .models import Order, ProductsOrder
 from .serializers import OrderSerializer
-from permissions import IsEmployee
+from permissions import IsEmployee, IsProductOwner
 
+#Criar um pedido de um carrinho existente
+class OrderCreateView(generics.CreateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    serializer_class = OrderSerializer
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        cart = user.cart
+        products = cart.products.all()
+        
+        if not products:
+            return Response({"Cart is empty!"}, status=400)
+
+        order = Order.objects.create(user=user, cart=cart)
+
+        for product in products:
+            ProductsOrder.objects.create(product=product, order=order)
+        
+        cart.products.clear()
+
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
 
 #Lista os produtos do pedido
 class OrderListView(generics.ListAPIView):
@@ -23,7 +48,7 @@ class OrderListView(generics.ListAPIView):
 #Atualização do status do pedido
 class OrderDetailView(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsEmployee]
+    permission_classes = [IsProductOwner, IsEmployee]
     
     serializer_class = OrderSerializer
     queryset = Order.objects.all()

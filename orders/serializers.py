@@ -37,9 +37,12 @@ class OrderSerializer(serializers.ModelSerializer):
     )
 
     def update(self, instance, validated_data):
-        instance.status = validated_data.get('status', instance.status)
-        instance.save()
+        user = self.request.user
 
-        self.send_email(instance)
+        status = validated_data.get('status')
+        if status and status != instance.status:
+            instance.status = status
+            instance.save()
+            self.send_email(instance)
 
         return instance
