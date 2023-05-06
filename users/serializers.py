@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from .models import User
 from addresses.serializers import AddressSerializer
-from carts.serializers import CartSerializer
+from carts.serializers import CartProductsSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
     address = AddressSerializer(read_only=True)
-    cart = CartSerializer(read_only=True)
+    cart = CartProductsSerializer(read_only=True)
 
     class Meta:
         model = User

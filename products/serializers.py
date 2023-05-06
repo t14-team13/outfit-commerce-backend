@@ -36,23 +36,3 @@ class ProductSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
-
-
-class CartProductsSerializer(serializers.ModelSerializer):
-    products = serializers.SerializerMethodField()
-
-    def get_products(self, obj):
-        itens = Product.objects.filter(cart=obj.cart)
-
-        serializer = ProductSerializer(itens, many=True, partial=True)
-        return serializer.data
-
-    class Meta:
-        model = CartProducts
-
-        fields = ("cart_id", "products")
-
-        extra_kwargs = {
-            "cart_id": {"read_only": True},
-            "products": {"read_only": True},
-        }
