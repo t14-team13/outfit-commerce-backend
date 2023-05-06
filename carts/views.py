@@ -1,19 +1,18 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, CreateAPIView
 from .models import Cart
-from .serializers import CartSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from products.models import Product, CartProducts
-from products.serializers import CartProductsSerializer
+from .serializers import CartProductsSerializer, CartPivotSerializer
 from rest_framework.exceptions import ValidationError
+import ipdb
 
 # Create your views here.
 
 
 class CartView(ListAPIView):
-    queryset = Cart.objects.all()
-    serializer_class = CartSerializer
+    serializer_class = CartProductsSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     pagination_class = None
@@ -24,7 +23,7 @@ class CartView(ListAPIView):
 
 class CartDetailView(CreateAPIView):
     queryset = CartProducts.objects.all()
-    serializer_class = CartProductsSerializer
+    serializer_class = CartPivotSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -37,7 +36,7 @@ class CartDetailView(CreateAPIView):
 
 class CartCreateView(CreateAPIView):
     queryset = Cart.objects.all()
-    serializer_class = CartSerializer
+    serializer_class = CartProductsSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
