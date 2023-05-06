@@ -2,11 +2,11 @@ from rest_framework import serializers
 from django.core.mail import send_mail
 
 from .models import Order
-from carts.models import Cart
-from products.models import Product
+from products.serializers import ProductSerializer
 
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
+    # order = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -16,15 +16,23 @@ class OrderSerializer(serializers.ModelSerializer):
             "status",
             "created_at",
             "updated_at",
-            "products"
+            "products",
+            # "order",
         ]
 
-    def get_user_cart_products(user):
-        cart = Cart.objects.filter(user=user).first()
-        if cart:
-            return Product.objects.filter(cart=cart)
-        else:
-            return []
+    def get_products(self, obj):
+        products = obj.products.all()
+        serializer = ProductSerializer(products, many=True)
+        return serializer.data
+
+    # def get_order(self, obj):
+    #     if "order" in self.context:
+    #         order_serializer = OrderDetailSerializer(
+    #             instance = self.context["order"]
+    #         )
+    #         return order_serializer.data
+    #     else:
+    #         return None
 
     @staticmethod
     def send_email(order):

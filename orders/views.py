@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
 from .models import Order, ProductsOrder
+from products.models import CartProducts
 from .serializers import OrderSerializer
 from permissions import IsEmployee
 
@@ -15,23 +16,21 @@ class OrderCreateView(generics.CreateAPIView):
 
     serializer_class = OrderSerializer
 
-    def post(self, request, *args, **kwargs):
-        user = request.user
+    def perform_create(self, serializer):
+        user = self.request.user
         cart = user.cart
-        products = cart.products.all()
-        
-        if not products:
-            return Response({"Cart is empty!"}, status=400)
+        cart_products = CartProducts.objects.filter(cart=cart)
 
-        order = Order.objects.create(user=user, cart=cart)
+        order = serializer.save(user=user, cart=cart)
 
-        for product in products:
-            ProductsOrder.objects.create(product=product, order=order)
-        
-        cart.products.clear()
+        for cart_product in cart_products:
+            ProductsOrder.objects.create(
+                order=order,
+                product=cart_product.product,
+            )
 
-        serializer = OrderSerializer(order)
-        return Response(serializer.data)
+        cart_products.delete()
+
 
 #Lista os produtos do pedido
 class OrderListView(generics.ListAPIView):

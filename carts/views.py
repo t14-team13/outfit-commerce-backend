@@ -16,15 +16,10 @@ class CartView(ListAPIView):
     serializer_class = CartSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    pagination_class = None
 
     def get_queryset(self):
-        cart = Cart.objects.get(user_id=self.request.user.id)
-        cart_products = CartProducts.objects.get(cart_id=cart.id)
-
-        return cart_products
-    
-    def get_serializer_class(self):
-        return CartReturnSerializer(many=True)
+        return Cart.objects.filter(user=self.request.user)
 
 
 class CartDetailView(CreateAPIView):
