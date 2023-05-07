@@ -51,6 +51,6 @@ class OrderSerializer(serializers.ModelSerializer):
         if status and status != instance.status:
             instance.status = status
             instance.save()
-            self.send_email(instance)
+            self.send_email(instance, request=None)
 
         return instance

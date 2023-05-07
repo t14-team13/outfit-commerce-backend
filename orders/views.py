@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from .models import Order, ProductsOrder
 from products.models import CartProducts
 from .serializers import OrderSerializer
-from permissions import IsEmployee
+from permissions import IsEmployee, IsProductOwner
 
 #Criar um pedido de um carrinho existente
 class OrderCreateView(generics.CreateAPIView):
@@ -47,7 +47,7 @@ class OrderListView(generics.ListAPIView):
 #Atualização do status do pedido
 class OrderDetailView(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsEmployee]
+    permission_classes = [IsEmployee, IsProductOwner]
     
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
