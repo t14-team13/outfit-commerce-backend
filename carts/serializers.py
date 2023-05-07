@@ -1,61 +1,53 @@
 from rest_framework import serializers
-from .models import Cart
 from products.models import CartProducts, Product
-from rest_framework.validators import UniqueValidator
+from products.models import Product
+from products.serializers import ProductSerializer
+from .models import Cart
 
 
-class CartSerializer(serializers.ModelSerializer):
+class CartProductsSerializer(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField()
     amount = serializers.SerializerMethodField()
     total_price = serializers.SerializerMethodField()
 
-    def get_amount(self, obj):
+    def sum_amount_or_price(self, obj):
         user = self.context.get("request").user
 
-        itens = Product.objects.filter(cart=obj)
+        products = Product.objects.filter(cart=obj)
 
         amount = 0
+        price = 0
 
-        for i, value in enumerate(itens):
+        for i, value in enumerate(products):
             amount += 1
+            price += value.price
+
+        return amount, price
+
+    def get_products(self, obj):
+        products = Product.objects.filter(cart=obj)
+
+        serializer = ProductSerializer(products, many=True)
+        return serializer.data
+
+    def get_amount(self, obj):
+        amount, _ = self.sum_amount_or_price(obj)
 
         return amount
 
     def get_total_price(self, obj):
-        user = self.context.get("request").user
-
-        itens = Product.objects.filter(cart=obj)
-
-        price = 0
-
-        for i, value in enumerate(itens):
-            price += value.price
+        _, price = self.sum_amount_or_price(obj)
 
         return price
 
     class Meta:
         model = Cart
-        fields = ("id", "amount", "total_price", "user_id")
-        extra_kwargs = {"id": {"read_only": True}, "user_id": {"read_only": True}}
+
+        fields = ("id", "products", "amount", "total_price")
 
 
-# Mudar para o product serializer
-class ProductReturnSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Product
-        fields = ("id", "name", "price")
-
-
-class CartReturnSerializer(serializers.ModelSerializer):
-    products_list = ProductReturnSerializer(many=True, read_only=True)
-
+class CartPivotSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartProducts
-        fields = ("cart_id", "products_list")
-        extra_kwargs = {
-            "cart_id": {"read_only": True},
-            "products_list": {"read_only": True},
-        }
 
-    def create(self, validated_data):
-        return super().create(validated_data)
+        exclude = ["id", "product", "cart"]
