@@ -47,7 +47,14 @@ class CartProductsSerializer(serializers.ModelSerializer):
 
 
 class CartPivotSerializer(serializers.ModelSerializer):
+    product_data = serializers.SerializerMethodField()
+
+    def get_product_data(self, obj):
+        prod = ProductSerializer(obj.product)
+        return prod.data
+
     class Meta:
         model = CartProducts
 
-        exclude = ["id", "product", "cart"]
+        fields = ["id", "cart", "product_data"]
+        read_only_fields = ["cart", "product_data"]
