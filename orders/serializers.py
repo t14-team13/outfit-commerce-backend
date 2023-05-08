@@ -57,3 +57,4 @@ class OrderSerializer(serializers.ModelSerializer):
             settings.EMAIL_HOST,
             [order.user.email],
             fail_silently=False,
+        )
