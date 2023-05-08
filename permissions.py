@@ -10,7 +10,9 @@ class IsEmployee(permissions.BasePermission):
 
 class IsProductOwner(permissions.BasePermission):
     def has_object_permission(self, request: Request, view: View, obj):
-        return obj.user == request.user
+       owner = request.user
+       product_owner = set([product.user_id for product in obj.products.all()])
+       return owner.id in product_owner
 
 class IsAdminOrPostOnly(permissions.BasePermission):
     def has_permission(self, request, view):

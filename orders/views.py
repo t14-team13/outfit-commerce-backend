@@ -72,19 +72,23 @@ class OrderListView(generics.ListAPIView):
 class OrderDetailView(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsEmployee, IsProductOwner]
-    
-    serializer_class = OrderSerializer
-    queryset = Order.objects.all()
 
-    def patch(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+    def partial_update(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = self.get_serializer(order, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
-        updated_instance = serializer.update(instance, request.data)
+        status = request.data.get('status')
+        updated_order = serializer.update(
+            order,
+            {"status": request.data['status']}
+            )
 
-        if updated_instance.status != instance.status:
-            serializer.send_mail(updated_instance)
+        if updated_order and order.status != status:
+            serializer.send_mail(order)
 
         return Response(serializer.data)
       

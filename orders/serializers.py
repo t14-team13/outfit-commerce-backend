@@ -5,8 +5,6 @@ from .models import Order
 from products.models import Product
 from products.serializers import ProductSerializer
 
-
-
 class ReturnOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -50,14 +48,3 @@ class OrderSerializer(serializers.ModelSerializer):
             [order.user.email],
             fail_silently=False,
     )
-
-    # def update(self, instance, validated_data):
-    #     user = self.request.user
-
-    #     status = validated_data.get('status')
-    #     if status and status != instance.status:
-    #         instance.status = status
-    #         instance.save()
-    #         self.send_email(instance, request=None)
-
-    #     return instance
