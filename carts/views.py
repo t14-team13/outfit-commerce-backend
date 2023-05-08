@@ -41,9 +41,9 @@ class CartCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        cart_exist = Cart.objects.get(user=self.request.user)
+        cart_exist = Cart.objects.get_or_create(user=self.request.user)
 
         if not cart_exist:
             return serializer.save(user=self.request.user)
-
+    
         raise ValidationError({"error": "User cart already exists"})
