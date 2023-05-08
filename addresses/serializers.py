@@ -3,14 +3,23 @@ from .models import Address
 
 class AddressSerializer(serializers.ModelSerializer):
 
-    def validate(self, attrs):
-        user = self.context["request"].user
-        if user.address:
-            raise serializers.ValidationError('The user already has an address.')
-        return super().validate(attrs)
-
     def create(self, validated_data):
+        user = self.context["request"].user
+        user_addresses = Address.objects.filter(user=user)
+        if user_addresses.count() >= 5:
+            raise serializers.ValidationError('The user has already reached the maximum number of registered addresses.')
         return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        validated_data = {}
+        user = self.context["request"].user
+        address_set = Address.objects.filter(user=user)
+        for address in address_set:
+            address.selected = False
+            address.save()
+        validated_data["selected"] = True
+        return super().update(instance, validated_data)
+
 
     class Meta:
         model = Address
@@ -22,4 +31,5 @@ class AddressSerializer(serializers.ModelSerializer):
             "number",
             "complement",
             "zipcode",
+            "selected"
         ]
