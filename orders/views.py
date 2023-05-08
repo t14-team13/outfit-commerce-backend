@@ -46,8 +46,8 @@ class OrderCreateView(generics.CreateAPIView):
         for order in orders:
             order.save()
 
-        for product_id, product_stock in stock_update.items():
-            serializer.update_stock(product_id, product_stock)
+        for product_id, products_stock in stock_update.items():
+            serializer.update_stock(product_id, products_stock)
 
         cart_products.delete()
 
