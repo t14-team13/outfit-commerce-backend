@@ -22,44 +22,16 @@ class OrderCreateView(generics.CreateAPIView):
         cart = user.cart
         cart_products = CartProducts.objects.filter(cart=cart)
 
-        # orders = []
-        # stock_update = {}
-
-        # for cart_product in cart_products:
-        #     product = cart_product.product
-        #     seller_id = product.user_id
-
-        #     order = serializer.save(user=user, cart=cart)
-        #     order.user_id = seller_id
-        #     order.save()
-        #     orders.append(order)
-
-        #     ProductsOrder.objects.create(
-        #         order=order,
-        #         product=product,
-        #     )
-        
-        #     if product.id not in stock_update:
-        #         stock_update[product.id] = 0
-        #     stock_update[product.id] +=1
-
-        # for order in orders:
-        #     order.save()
-
-        # for product_id, product_stock in stock_update.items():
-        #     serializer.update_stock(product_id, product_stock)
-
-        # cart_products.delete()
-
-        # return self.serializer_class(orders, many=True).data
-
         order = serializer.save(user=user, cart=cart)
 
         for cart_product in cart_products:
+            product = cart_product.product
             ProductsOrder.objects.create(
                 order=order,
                 product=cart_product.product,
             )
+
+            serializer.update_stock(product.id, 1)
 
         cart_products.delete()
 
