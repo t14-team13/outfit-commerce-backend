@@ -2,11 +2,24 @@ from rest_framework import serializers
 from django.core.mail import send_mail
 
 from .models import Order
+from products.models import Product
 from products.serializers import ProductSerializer
+
+
+
+class ReturnOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "name",
+            "description",
+            "price",
+            "category"
+        ]
 
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
-    order = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -17,20 +30,16 @@ class OrderSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "products",
-            "order",
+            "user"
         ]
+
+        read_only_fields = ["user"]
 
     def get_products(self, obj):
         products = obj.products.all()
-        serializer = ProductSerializer(products, many=True)
+        serializer = ReturnOrderSerializer(products, many=True)
         return serializer.data
 
-    def get_order(self, obj):
-        if "order" in self.context:
-            order_serializer = OrderDetailSerializer(
-                instance = self.context["order"]
-            )
-            return order_serializer.data
 
     @staticmethod
     def send_email(order):
@@ -42,13 +51,13 @@ class OrderSerializer(serializers.ModelSerializer):
             fail_silently=False,
     )
 
-    def update(self, instance, validated_data):
-        user = self.request.user
+    # def update(self, instance, validated_data):
+    #     user = self.request.user
 
-        status = validated_data.get('status')
-        if status and status != instance.status:
-            instance.status = status
-            instance.save()
-            self.send_email(instance, request=None)
+    #     status = validated_data.get('status')
+    #     if status and status != instance.status:
+    #         instance.status = status
+    #         instance.save()
+    #         self.send_email(instance, request=None)
 
-        return instance
+    #     return instance
