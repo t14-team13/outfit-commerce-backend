@@ -6,7 +6,7 @@ from products.serializers import ProductSerializer
 
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
-    # order = serializers.SerializerMethodField()
+    order = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -17,7 +17,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "products",
-            # "order",
+            "order",
         ]
 
     def get_products(self, obj):
@@ -25,14 +25,12 @@ class OrderSerializer(serializers.ModelSerializer):
         serializer = ProductSerializer(products, many=True)
         return serializer.data
 
-    # def get_order(self, obj):
-    #     if "order" in self.context:
-    #         order_serializer = OrderDetailSerializer(
-    #             instance = self.context["order"]
-    #         )
-    #         return order_serializer.data
-    #     else:
-    #         return None
+    def get_order(self, obj):
+        if "order" in self.context:
+            order_serializer = OrderDetailSerializer(
+                instance = self.context["order"]
+            )
+            return order_serializer.data
 
     @staticmethod
     def send_email(order):
