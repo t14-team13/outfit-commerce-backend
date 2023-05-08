@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 
 from .models import Order, ProductsOrder
 from users.models import User
@@ -21,38 +22,48 @@ class OrderCreateView(generics.CreateAPIView):
         cart = user.cart
         cart_products = CartProducts.objects.filter(cart=cart)
 
-        orders = []
-        stock_update = {}
+        # orders = []
+        # stock_update = {}
+
+        # for cart_product in cart_products:
+        #     product = cart_product.product
+        #     seller_id = product.user_id
+
+        #     order = serializer.save(user=user, cart=cart)
+        #     order.user_id = seller_id
+        #     order.save()
+        #     orders.append(order)
+
+        #     ProductsOrder.objects.create(
+        #         order=order,
+        #         product=product,
+        #     )
+        
+        #     if product.id not in stock_update:
+        #         stock_update[product.id] = 0
+        #     stock_update[product.id] +=1
+
+        # for order in orders:
+        #     order.save()
+
+        # for product_id, product_stock in stock_update.items():
+        #     serializer.update_stock(product_id, product_stock)
+
+        # cart_products.delete()
+
+        # return self.serializer_class(orders, many=True).data
+
+        order = serializer.save(user=user, cart=cart)
 
         for cart_product in cart_products:
-            product = cart_product.product
-            seller_id = product.user_id
-
-            order = serializer.save(user=user, cart=cart)
-            order.user_id = seller_id
-            order.save()
-            orders.append(order)
-
             ProductsOrder.objects.create(
                 order=order,
-                product=product,
+                product=cart_product.product,
             )
-        
-            if product.id not in stock_update:
-                stock_update[product.id] = 0
-            stock_update[product.id] +=1
-
-        for order in orders:
-            order.save()
-
-        for product_id, products_stock in stock_update.items():
-            serializer.update_stock(product_id, products_stock)
 
         cart_products.delete()
 
-        return OrderSerializer(orders, many=True).data
-
-# Lista os produtos do pedido
+#Lista os produtos do pedido
 class OrderListView(generics.ListAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -64,11 +75,9 @@ class OrderListView(generics.ListAPIView):
 
         return Order.objects.filter(user=user)
 
-
-# Atualização do status do pedido
+#Atualização do status do pedido
 class OrderDetailView(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
-
     permission_classes = [IsEmployee, IsProductOwner]
 
     queryset = Order.objects.all()
@@ -89,3 +98,4 @@ class OrderDetailView(generics.UpdateAPIView):
             serializer.send_mail(order)
 
         return Response(serializer.data)
+      

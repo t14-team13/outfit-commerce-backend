@@ -16,7 +16,6 @@ class ReturnOrderSerializer(serializers.ModelSerializer):
             "category"
         ]
 
-
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
 
@@ -57,3 +56,4 @@ class OrderSerializer(serializers.ModelSerializer):
             settings.EMAIL_HOST,
             [order.user.email],
             fail_silently=False,
+    )
