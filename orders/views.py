@@ -22,41 +22,36 @@ class OrderCreateView(generics.CreateAPIView):
         cart = user.cart
         cart_products = CartProducts.objects.filter(cart=cart)
 
-        seller_products = {}
+        orders = []
+        stock_update = {}
+
         for cart_product in cart_products:
-            seller_id = cart_product.product.user_id
-            if seller_id not in seller_products:
-                seller_products[seller_id] = []
-            seller_products[seller_id].append(cart_product.product)
-        
-        for seller_id, products in seller_products.items():
-            seller_user = User.objects.get(id=seller_id)
+            product = cart_product.product
+            seller_id = product.user_id
 
             order = serializer.save(user=user, cart=cart)
-
-            for product in products:
-                products_order = ProductsOrder.objects.create(
-                    order=order,
-                    product=product,
-                )
-            
-                serializer.update_stock(product.id, 1)
-            
-            order.user = seller_user
+            order.user_id = seller_id
             order.save()
+            orders.append(order)
+
+            ProductsOrder.objects.create(
+                order=order,
+                product=product,
+            )
+        
+            if product.id not in stock_update:
+                stock_update[product.id] = 0
+            stock_update[product.id] +=1
+
+        for order in orders:
+            order.save()
+
+        for product_id, product_stock in stock_update.items():
+            serializer.update_stock(product_id, product_stock)
 
         cart_products.delete()
 
-        # order = serializer.save(user=user, cart=cart)
-
-        # for cart_product in cart_products:
-        #     ProductsOrder.objects.create(
-        #         order=order,
-        #         product=cart_product.product,
-        #     )
-
-        # cart_products.delete()
-
+        return OrderSerializer(orders, many=True).data
 
 #Lista os produtos do pedido
 class OrderListView(generics.ListAPIView):

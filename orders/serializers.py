@@ -40,8 +40,13 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def update_stock(self, product_id, stock):
         product = Product.objects.get(id=product_id)
+        if product.stock == 0:
+            raise serializers.ValidationError("Product not available")
         product.stock -= stock
+        product.available = product.stock > 0
         product.save()
+
+        return product
 
     @staticmethod
     def send_email(order):
