@@ -5,19 +5,14 @@ from .models import Order
 from carts.models import Cart
 from products.models import Product
 
+
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
 
-        fields = [
-            "id",
-            "status",
-            "created_at",
-            "updated_at",
-            "products"
-        ]
+        fields = ["id", "status", "created_at", "updated_at", "products"]
 
     def get_user_cart_products(user):
         cart = Cart.objects.filter(user=user).first()
@@ -34,10 +29,10 @@ class OrderSerializer(serializers.ModelSerializer):
             settings.EMAIL_HOST,
             [order.user.email],
             fail_silently=False,
-    )
+        )
 
     def update(self, instance, validated_data):
-        instance.status = validated_data.get('status', instance.status)
+        instance.status = validated_data.get("status", instance.status)
         instance.save()
 
         self.send_email(instance)

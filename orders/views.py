@@ -8,7 +8,7 @@ from .serializers import OrderSerializer
 from permissions import IsEmployee
 
 
-#Lista os produtos do pedido
+# Lista os produtos do pedido
 class OrderListView(generics.ListAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -20,11 +20,12 @@ class OrderListView(generics.ListAPIView):
 
         return Order.objects.filter(user=user)
 
-#Atualização do status do pedido
+
+# Atualização do status do pedido
 class OrderDetailView(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsEmployee]
-    
+
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
 
@@ -39,4 +40,3 @@ class OrderDetailView(generics.UpdateAPIView):
             serializer.send_mail(updated_instance)
 
         return Response(serializer.data)
-      
