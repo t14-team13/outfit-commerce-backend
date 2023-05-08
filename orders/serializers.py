@@ -28,7 +28,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "products",
-            "user"
+            "user",
         ]
 
         read_only_fields = ["user"]
@@ -38,6 +38,10 @@ class OrderSerializer(serializers.ModelSerializer):
         serializer = ReturnOrderSerializer(products, many=True)
         return serializer.data
 
+    def update_stock(self, product_id, stock):
+        product = Product.objects.get(id=product_id)
+        product.stock -= stock
+        product.save()
 
     @staticmethod
     def send_email(order):

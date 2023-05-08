@@ -35,10 +35,12 @@ class OrderCreateView(generics.CreateAPIView):
             order = serializer.save(user=user, cart=cart)
 
             for product in products:
-                ProductsOrder.objects.create(
+                products_order = ProductsOrder.objects.create(
                     order=order,
                     product=product,
                 )
+            
+                serializer.update_stock(product.id, 1)
             
             order.user = seller_user
             order.save()
