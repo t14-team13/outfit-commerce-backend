@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from .models import User
+from addresses.models import Address
 from addresses.serializers import AddressSerializer
 from carts.serializers import CartProductsSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     def create(self, validated_data: dict):
         return User.objects.create_user(**validated_data)
 
@@ -18,8 +20,14 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    address = AddressSerializer(read_only=True)
     cart = CartProductsSerializer(read_only=True)
+    address = serializers.SerializerMethodField(read_only=True)
+
+    def get_address(self, obj):
+        address_selected = Address.objects.filter(user=obj, selected=True)
+        if not address_selected:
+            return None
+        return AddressSerializer(address_selected.first()).data
 
     class Meta:
         model = User

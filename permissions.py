@@ -15,14 +15,18 @@ class IsProductOwner(permissions.BasePermission):
        return owner.id in product_owner
 
 class IsAdminOrPostOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view) -> bool:
         return bool(request.method == "POST" or request.user.is_staff)
 
 
 class IsAdminOrAccountOwner(permissions.BasePermission):
     def has_object_permission(self, request, view: View, obj: User) -> bool:
-        return (
+        return bool(
             request.user.is_authenticated
             and obj == request.user
             or request.user.is_staff
         )
+    
+class itsYours(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj) -> bool:
+        return bool(request.user.is_authenticated and obj.user == request.user)
