@@ -5,16 +5,11 @@ from .models import Order
 from products.models import Product
 from products.serializers import ProductSerializer
 
+
 class ReturnOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = [
-            "id",
-            "name",
-            "description",
-            "price",
-            "category"
-        ]
+        fields = ["id", "name", "description", "price", "category"]
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -57,3 +52,4 @@ class OrderSerializer(serializers.ModelSerializer):
             settings.EMAIL_HOST,
             [order.user.email],
             fail_silently=False,
+        )
