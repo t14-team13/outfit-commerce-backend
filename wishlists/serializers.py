@@ -17,7 +17,6 @@ class WishListProductSerializer(serializers.ModelSerializer):
 
         fields = ("wishlist_products",)
         read_only_fields = ["wishlist_products"]
-        depth = 1
 
 
 class WishListPivotSerializer(serializers.ModelSerializer):
