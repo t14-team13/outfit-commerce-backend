@@ -6,6 +6,7 @@ class Product(models.Model):
         ordering = ["id"]
 
     name = models.CharField(max_length=40)
+    image = models.TextField(default=None, null=True)
     description = models.CharField(max_length=255)
     price = models.DecimalField(decimal_places=2, max_digits=10)
     category = models.CharField(max_length=40)
