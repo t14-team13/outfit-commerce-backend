@@ -46,14 +46,7 @@ DJANGO_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
-MY_APPS = [
-    "addresses",
-    "carts",
-    "orders",
-    "products",
-    "users",
-    "comments"
-]
+MY_APPS = ["addresses", "carts", "orders", "products", "users", "comments", "coupons"]
 THIRD_PARTY_APPS = [
     "rest_framework",
     "drf_spectacular",
