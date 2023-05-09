@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated
 from products.models import Product, CartProducts
 from .serializers import CartProductsSerializer, CartPivotSerializer
 from rest_framework.exceptions import ValidationError
-import ipdb
 
 # Create your views here.
 
@@ -28,7 +27,7 @@ class CartDetailView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        cart_exist = Cart.objects.get(user=self.request.user)
+        cart_exist, _ = Cart.objects.get_or_create(user=self.request.user)
         product_id = self.kwargs.get("pk")
         product = get_object_or_404(Product, id=product_id)
         serializer.save(cart=cart_exist, product=product)
@@ -43,5 +42,5 @@ class CartCreateView(CreateAPIView):
     def perform_create(self, serializer):
         cart_exist = Cart.objects.filter(user=self.request.user)
         if cart_exist:
-            raise ValidationError({"error": "User cart already exists"})
+            raise ValidationError({"error": "The user already contains a cart!"})
         return serializer.save(user=self.request.user)

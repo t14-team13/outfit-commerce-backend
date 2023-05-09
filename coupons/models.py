@@ -8,10 +8,20 @@ class Coupon(models.Model):
     discount = models.IntegerField()
     amount = models.IntegerField()
 
-    coupon_creator_user_admin = models.ForeignKey(
+    user = models.ForeignKey(
         "users.User", on_delete=models.CASCADE, related_name="registered_coupons"
     )
 
-    coupon_using_user = models.ManyToManyField(
-        "carts.Cart", related_name="coupons_used"
+    coupon_using_cart = models.ManyToManyField(
+        "carts.Cart", related_name="coupons_used", through="coupons.CouponPivot"
+    )
+
+
+class CouponPivot(models.Model):
+    coupon = models.ForeignKey(
+        "coupons.Coupon", on_delete=models.CASCADE, related_name="coupons"
+    )
+
+    cart = models.ForeignKey(
+        "carts.Cart", on_delete=models.CASCADE, related_name="cart"
     )
