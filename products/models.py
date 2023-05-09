@@ -22,6 +22,12 @@ class Product(models.Model):
         "carts.Cart", related_name="products_in_cart", through="products.CartProducts"
     )
 
+    wishlist = models.ManyToManyField(
+        "wishlists.WishList",
+        related_name="products_in_wishlist",
+        through="products.WishListProducts",
+    )
+
 
 class CartProducts(models.Model):
     product = models.ForeignKey(
@@ -32,4 +38,16 @@ class CartProducts(models.Model):
 
     cart = models.ForeignKey(
         "carts.Cart", on_delete=models.CASCADE, related_name="current_cart"
+    )
+
+
+class WishListProducts(models.Model):
+    product = models.ForeignKey(
+        "products.Product", on_delete=models.CASCADE, related_name="products_wishlist"
+    )
+
+    wishlist = models.ForeignKey(
+        "wishlists.WishList",
+        on_delete=models.CASCADE,
+        related_name="wishlists_products",
     )

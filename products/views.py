@@ -63,7 +63,7 @@ class ProductSellerView(ListAPIView, CreateAPIView):
 
 # atualiza e deleta um produto
 class ProductSellerDetailView(UpdateAPIView, DestroyAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, IsEmployee]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsEmployee]
