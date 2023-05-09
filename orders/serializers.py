@@ -52,3 +52,60 @@ class OrderSerializer(serializers.ModelSerializer):
             [order.user.email],
             fail_silently=False,
         )
+
+class CreateOrderSerializer(serializers.ModelSerializer):
+    cart_products = ProductSerializer(read_only=True, many=True)
+    orders = OrderSerializer(
+        read_only=True, many=True, source="orders"
+    )
+
+    class Meta:
+        model = Order
+        fields = [
+            "id",
+            "status",
+            "orders"
+            "cart_products"
+        ]
+
+        read_only_fields = ["user"]
+
+    def create(self, validated_data):
+        user = validated_data.pop("user")
+        cart = user.cart
+
+        cart_products = CartProducts.objects.filter(cart=cart).values_list(
+            "product_id", flat=True
+        )
+
+        products = [
+            Product.objects.get(id=product_id)
+            for product in cart_products
+        ]
+
+        new_list = ProductSerializer(products, many=True)
+        sellers = ser([
+            product['user']
+            for product in new_list.data
+        ])
+
+        new_orders = []
+
+        for seller in sellers:
+            order_products = []
+
+            for product in new_list.data:
+                if seller == product["user"]:
+                    order_products.append(product)
+            
+            buyer = validated_data.copy()
+            buyer["products"] = order_products
+
+            order = Order.objects.create(**buyer, user=user)
+            new_orders.append(order)
+        
+        cart.delete()
+
+        return new_orders
+
+    
