@@ -10,7 +10,7 @@ from products.models import CartProducts
 from .serializers import OrderSerializer
 from permissions import IsEmployee, IsProductOwner
 
-#Criar um pedido de um carrinho existente
+#Criar um pedido do carrinho do usuário
 class OrderCreateView(generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
