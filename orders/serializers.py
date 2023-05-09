@@ -11,7 +11,6 @@ class ReturnOrderSerializer(serializers.ModelSerializer):
         model = Product
         fields = ["id", "name", "description", "price", "category"]
 
-
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
 
@@ -33,6 +32,9 @@ class OrderSerializer(serializers.ModelSerializer):
         products = obj.products.all()
         serializer = ReturnOrderSerializer(products, many=True)
         return serializer.data
+
+    def create(self, validated_data):
+        return validated_data["order"]
 
     def update_stock(self, product_id, stock):
         product = Product.objects.get(id=product_id)

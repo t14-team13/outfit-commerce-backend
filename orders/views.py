@@ -5,12 +5,11 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
 from .models import Order, ProductsOrder
-from users.models import User
 from products.models import CartProducts
 from .serializers import OrderSerializer
 from permissions import IsEmployee, IsProductOwner
 
-#Criar um pedido de um carrinho existente
+#Criar um pedido do carrinho do usuário
 class OrderCreateView(generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -25,35 +24,38 @@ class OrderCreateView(generics.CreateAPIView):
         orders = []
         stock_update = {}
 
+        seller_products = {}
+
         for cart_product in cart_products:
             product = cart_product.product
             seller_id = product.user_id
 
-            order = serializer.save(user=user, cart=cart)
-            order.user_id = seller_id
-            order.save()
-            orders.append(order)
+            try:
+                seller_products[product.user] += [product]
+            except KeyError:
+                seller_products[product.user] = [product]
 
-            ProductsOrder.objects.create(
-                order=order,
-                product=product,
-            )
-        
             if product.id not in stock_update:
                 stock_update[product.id] = 0
             stock_update[product.id] +=1
 
-        for order in orders:
-            order.save()
+        for key, value in seller_products.items():
+            order = Order.objects.create(user=key, cart=cart)
+
+            for product in value:
+                ProductsOrder.objects.create(
+                order=order,
+                product=product,
+            )
 
         for product_id, products_stock in stock_update.items():
             serializer.update_stock(product_id, products_stock)
 
-        cart_products.delete()
+        user.cart.products_in_cart.set([])
 
-        return OrderSerializer(orders, many=True).data
+        serializer.save(order=order)
 
-# Lista os produtos do pedido
+#Lista os produtos do pedido
 class OrderListView(generics.ListAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -65,11 +67,9 @@ class OrderListView(generics.ListAPIView):
 
         return Order.objects.filter(user=user)
 
-
-# Atualização do status do pedido
+#Atualização do status do pedido
 class OrderDetailView(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
-
     permission_classes = [IsEmployee, IsProductOwner]
 
     queryset = Order.objects.all()
@@ -90,3 +90,6 @@ class OrderDetailView(generics.UpdateAPIView):
             serializer.send_mail(order)
 
         return Response(serializer.data)
+
+
+      
