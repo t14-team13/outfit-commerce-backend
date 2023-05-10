@@ -17,7 +17,7 @@ class CartPivotSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartProducts
 
-        fields = ["id", "cart", "product_data"]
+        fields = ["cart", "product_data"]
         read_only_fields = ["cart", "product_data"]
 
 

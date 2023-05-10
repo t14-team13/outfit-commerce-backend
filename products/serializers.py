@@ -37,3 +37,14 @@ class ProductSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class ProductsSoldSerializer(serializers.ModelSerializer):
+    products_sold = ProductSerializer(many=True)
+
+    class Meta:
+        model = Product
+        fields = ["products_sold"]
+        extra_kwargs = {
+            "products_sold": {"read_only": True}
+        }

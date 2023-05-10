@@ -1,7 +1,7 @@
 from .models import Product
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, ProductsSoldSerializer
 from permissions import IsEmployee
 from rest_framework.generics import (
     ListAPIView,
@@ -10,7 +10,7 @@ from rest_framework.generics import (
     UpdateAPIView,
     DestroyAPIView,
 )
-from orders.models import ProductsOrder
+from orders.models import ProductsOrder, Order
 from django_filters import rest_framework as filters
 
 
@@ -39,7 +39,7 @@ class ProductDetailView(RetrieveAPIView):
 
 
 # retorna todos os produtos vendidos e cadastra um novo produto no site
-class ProductSellerView(ListAPIView, CreateAPIView):
+class ProductSellerView(CreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsEmployee]
     queryset = Product.objects.all()
@@ -49,17 +49,6 @@ class ProductSellerView(ListAPIView, CreateAPIView):
         user = self.request.user
         serializer.save(user=user)
 
-    # Aguardando as outras rotas para fazer os testes
-    def get_queryset(self):
-        sold_products = []
-        user = self.request.user
-        order_products = ProductsOrder.objects.all()
-        for item in order_products:
-            if item.product.user_id == user.id:
-                sold_products.append(item)
-
-        return sold_products
-
 
 # atualiza e deleta um produto
 class ProductSellerDetailView(UpdateAPIView, DestroyAPIView):
@@ -67,3 +56,17 @@ class ProductSellerDetailView(UpdateAPIView, DestroyAPIView):
     serializer_class = ProductSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsEmployee]
+
+
+class ProductsSoldView(ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsEmployee]
+    queryset = ProductsOrder.objects.all()
+    serializer_class = ProductsSoldSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        order = Order.objects.filter(user=user)
+        order_products = ProductsOrder.objects.filter(order=order)
+
+        return order
