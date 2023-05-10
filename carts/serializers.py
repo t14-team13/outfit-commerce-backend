@@ -14,11 +14,16 @@ class CartPivotSerializer(serializers.ModelSerializer):
         product = ProductSerializer(obj.product)
         return product.data
 
+    cart_owner = serializers.SerializerMethodField()
+
+    def get_cart_owner(self, obj):
+        return obj.cart.user.username
+
     class Meta:
         model = CartProducts
 
-        fields = ["id", "cart", "product_data"]
-        read_only_fields = ["cart", "product_data"]
+        fields = ["id", "cart_owner", "product_data"]
+        read_only_fields = ["product_data"]
 
 
 class CartProductsSerializer(serializers.ModelSerializer):

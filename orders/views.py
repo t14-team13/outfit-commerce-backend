@@ -18,7 +18,10 @@ class OrderCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         user = self.request.user
-        cart = user.cart
+        try:
+            cart = user.cart
+        except:
+            raise ValidationError({"error": "user has no cart"})
         cart_products = CartProducts.objects.filter(cart=cart)
         if not len(cart_products):
             raise ValidationError({"error": "your cart is empty"})
