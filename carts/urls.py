@@ -3,7 +3,9 @@ from . import views
 
 
 urlpatterns = [
-    path("cart/", views.CartCreateView.as_view()),
-    path("cart/products/", views.CartView.as_view()),
-    path("cart/products/<int:pk>/", views.CartDetailView.as_view()),
+    # Usuário autenticado/POST -> Criar um carrinho
+    # Usuário autenticado/GET -> Ver os produtos do carrinho
+    path("cart/", views.CartView.as_view()),
+    # Usuário autenticado/POST -> Adicionar o produto <pk> ao carrinho
+    path("cart/<int:pk>/", views.CartDetailView.as_view()),
 ]

@@ -6,8 +6,6 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 
-# Create your views here.
-
 
 class CouponView(CreateAPIView):
     queryset = Coupon
@@ -26,7 +24,11 @@ class CouponCartView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        cart_user = self.request.user.cart
+        try:
+            cart_user = self.request.user.cart
+        except:
+            raise ValidationError({"error": "user has no cart"})
+
         coupon_used_for_user = CouponPivot.objects.filter(cart=cart_user)
 
         if coupon_used_for_user:

@@ -2,7 +2,7 @@ from .models import User
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .serializers import UserSerializer
 from rest_framework import generics
-from permissions import IsAdminOrPostOnly, IsAdminOrAccountOwner
+from permissions import IsAdminOrPostOnly
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 

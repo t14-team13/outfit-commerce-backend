@@ -8,8 +8,6 @@ from products.models import WishListProducts
 from products.models import Product
 from django.shortcuts import get_object_or_404
 
-# Create your views here.
-
 
 class WishViewList(ListAPIView):
     authentication_classes = [JWTAuthentication]
