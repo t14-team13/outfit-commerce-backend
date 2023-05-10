@@ -24,8 +24,6 @@ class CouponCartSerializer(serializers.ModelSerializer):
 
     def get_coupon(self, obj):
         coupon = Coupon.objects.get(id=obj.coupon.id)
-        if not coupon.amount:
-            raise ValidationError({"error": "This coupon is expired!"})
         coupon.amount = coupon.amount - 1
         coupon.save()
         return coupon.code
