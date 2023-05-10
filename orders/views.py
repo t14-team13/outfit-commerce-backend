@@ -38,8 +38,9 @@ class OrderCreateView(generics.CreateAPIView):
                 seller_products[product.user] = [product]
 
             if product.id not in stock_update:
-                stock_update[product.id] = 0
-            stock_update[product.id] += 1
+                stock_update[product.id] = {"stock": 0, "sold": 0}
+            stock_update[product.id]["stock"] += 1
+            stock_update[product.id]["sold"] += 1
 
         for key, value in seller_products.items():
             order = Order.objects.create(user=key, cart=cart)
@@ -50,8 +51,8 @@ class OrderCreateView(generics.CreateAPIView):
                     product=product,
                 )
 
-        for product_id, products_stock in stock_update.items():
-            serializer.update_stock(product_id, products_stock)
+        for product_id, update in stock_update.items():
+            serializer.update_stock(product_id, update["stock"], update["sold"])
 
         user.cart.products_in_cart.set([])
 

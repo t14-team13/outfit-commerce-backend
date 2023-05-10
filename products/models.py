@@ -11,6 +11,7 @@ class Product(models.Model):
     price = models.DecimalField(decimal_places=2, max_digits=10)
     category = models.CharField(max_length=40)
     stock = models.IntegerField()
+    sold = models.IntegerField(default=0)
 
     user = models.ForeignKey(
         "users.User",

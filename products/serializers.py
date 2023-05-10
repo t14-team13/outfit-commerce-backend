@@ -37,3 +37,8 @@ class ProductSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+class ReturnSoldProductsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ["id", "name", "description", "price", "category", "user", "sold", "stock"]

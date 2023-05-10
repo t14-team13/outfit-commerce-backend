@@ -1,7 +1,7 @@
 from .models import Product
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, ReturnSoldProductsSerializer
 from permissions import IsEmployeeOrAdmin, ItsYoursOrAdmin
 from rest_framework.generics import (
     ListAPIView,
@@ -27,7 +27,7 @@ class ProductFilter(filters.FilterSet):
 # retorna todos os produtos
 class ProductView(ListAPIView):
     queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+    serializer_class = ReturnSoldProductsSerializer
     filterset_class = ProductFilter
 
 

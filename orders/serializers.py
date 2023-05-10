@@ -11,7 +11,6 @@ class ReturnOrderSerializer(serializers.ModelSerializer):
         model = Product
         fields = ["id", "name", "description", "price", "category", "user"]
 
-
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
 
@@ -36,11 +35,12 @@ class OrderSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return validated_data["order"]
 
-    def update_stock(self, product_id, stock):
+    def update_stock(self, product_id, stock, sold):
         product = Product.objects.get(id=product_id)
-        if product.stock == 0:
+        if product.stock <= 0:
             raise serializers.ValidationError("Product not available")
         product.stock -= stock
+        product.sold += sold
         product.available = product.stock > 0
         product.save()
 
