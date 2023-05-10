@@ -41,8 +41,12 @@ class WishDetailView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        wishlist_exist, _ = WishList.objects.get_or_create(user=self.request.user)
         product_id = self.kwargs.get("pk")
         product = get_object_or_404(Product, id=product_id)
+        wishlist_exist, _ = WishList.objects.get_or_create(user=self.request.user)
+        wish_pivot =  WishListProducts.objects.filter(wishlist=wishlist_exist, product=product)
+        
+        if wish_pivot:
+            raise ValidationError({"error": "product already exists in wishlist"})
 
         serializer.save(product=product, wishlist=wishlist_exist)
