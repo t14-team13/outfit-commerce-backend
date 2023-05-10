@@ -38,29 +38,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
         return instance
 
-class ProductSoldSerializer(ProductSerializer):
-    sold = serializers.SerializerMethodField()
-
-    def get_sold(self, obj):
-        ...
-    
+class ReturnSoldProductsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-
-        fields = [
-            "id",
-            "name",
-            "image",
-            "description",
-            "price",
-            "category",
-            "stock",
-            "user_id",
-            "available",
-        ]
-
-        extra_kwargs = {
-            "user_id": {"read_only": True},
-            "sold": {"read_only": True},
-        }
-        
+        fields = ["id", "name", "description", "price", "category", "user", "sold", "stock"]
