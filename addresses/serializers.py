@@ -1,15 +1,17 @@
 from rest_framework import serializers
 from .models import Address
 
-class AddressSerializer(serializers.ModelSerializer):
 
+class AddressSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context["request"].user
         user_addresses = Address.objects.filter(user=user)
         if user_addresses.count() >= 5:
-            raise serializers.ValidationError('The user has already reached the maximum number of registered addresses.')
+            raise serializers.ValidationError(
+                "The user has already reached the maximum number of registered addresses."
+            )
         return super().create(validated_data)
-    
+
     def update(self, instance, validated_data):
         validated_data = {}
         user = self.context["request"].user
@@ -19,7 +21,6 @@ class AddressSerializer(serializers.ModelSerializer):
             address.save()
         validated_data["selected"] = True
         return super().update(instance, validated_data)
-
 
     class Meta:
         model = Address
@@ -31,5 +32,5 @@ class AddressSerializer(serializers.ModelSerializer):
             "number",
             "complement",
             "zipcode",
-            "selected"
+            "selected",
         ]

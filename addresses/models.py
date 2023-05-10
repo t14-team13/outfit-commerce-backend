@@ -10,4 +10,6 @@ class Address(models.Model):
     zipcode = models.CharField(max_length=40)
 
     selected = models.BooleanField(default=False)
-    user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="adress_user")
+    user = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="adress_user"
+    )

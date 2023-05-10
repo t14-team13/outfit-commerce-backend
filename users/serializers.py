@@ -7,7 +7,6 @@ from carts.serializers import CartProductsSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     def create(self, validated_data: dict):
         return User.objects.create_user(**validated_data)
 

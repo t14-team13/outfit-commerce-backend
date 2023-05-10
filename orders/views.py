@@ -2,15 +2,15 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-
 from .models import Order, ProductsOrder
-from users.models import User
 from products.models import CartProducts
 from .serializers import OrderSerializer
-from permissions import IsEmployee, IsProductOwner
+from permissions import IsEmployee, ItsYoursOrAdmin
+from rest_framework.validators import ValidationError
+from coupons.models import CouponPivot
 
-#Criar um pedido de um carrinho existente
+
+# Criar um pedido do carrinho do usuário
 class OrderCreateView(generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -19,39 +19,50 @@ class OrderCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         user = self.request.user
-        cart = user.cart
+        try:
+            cart = user.cart
+        except:
+            raise ValidationError({"error": "user has no cart"})
         cart_products = CartProducts.objects.filter(cart=cart)
+        if not len(cart_products):
+            raise ValidationError({"error": "your cart is empty"})
 
         orders = []
         stock_update = {}
+
+        seller_products = {}
 
         for cart_product in cart_products:
             product = cart_product.product
             seller_id = product.user_id
 
-            order = serializer.save(user=user, cart=cart)
-            order.user_id = seller_id
-            order.save()
-            orders.append(order)
+            try:
+                seller_products[product.user] += [product]
+            except KeyError:
+                seller_products[product.user] = [product]
 
-            ProductsOrder.objects.create(
-                order=order,
-                product=product,
-            )
-        
             if product.id not in stock_update:
-                stock_update[product.id] = 0
-            stock_update[product.id] +=1
+                stock_update[product.id] = {"stock": 0, "sold": 0}
+            stock_update[product.id]["stock"] += 1
+            stock_update[product.id]["sold"] += 1
 
-        for order in orders:
-            order.save()
+        for key, value in seller_products.items():
+            order = Order.objects.create(user=key, cart=cart)
 
-        for product_id, products_stock in stock_update.items():
-            serializer.update_stock(product_id, products_stock)
+            for product in value:
+                ProductsOrder.objects.create(
+                    order=order,
+                    product=product,
+                )
 
-        cart_products.delete()
+        for product_id, update in stock_update.items():
+            serializer.update_stock(product_id, update["stock"], update["sold"])
 
-        return OrderSerializer(orders, many=True).data
+        CouponPivot.objects.filter(cart=cart).delete()
+        user.cart.products_in_cart.set([])
+
+        serializer.save(order=order)
+
 
 # Lista os produtos do pedido
 class OrderListView(generics.ListAPIView):
@@ -69,8 +80,7 @@ class OrderListView(generics.ListAPIView):
 # Atualização do status do pedido
 class OrderDetailView(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
-
-    permission_classes = [IsEmployee, IsProductOwner]
+    permission_classes = [IsEmployee, ItsYoursOrAdmin]
 
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
@@ -80,11 +90,14 @@ class OrderDetailView(generics.UpdateAPIView):
         serializer = self.get_serializer(order, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
-        status = request.data.get('status')
-        updated_order = serializer.update(
-            order,
-            {"status": request.data['status']}
+        status = request.data.get("status")
+        if not status:
+            raise ValidationError(
+                {
+                    "error": "status is a required field, choises are: Order placed, Order in progress and Order delivered"
+                }
             )
+        updated_order = serializer.update(order, {"status": status})
 
         if updated_order and order.status != status:
             serializer.send_mail(order)
