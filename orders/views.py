@@ -7,6 +7,7 @@ from products.models import CartProducts
 from .serializers import OrderSerializer
 from permissions import IsEmployee, ItsYoursOrAdmin
 from rest_framework.validators import ValidationError
+from coupons.models import CouponPivot
 
 
 # Criar um pedido do carrinho do usuário
@@ -54,6 +55,7 @@ class OrderCreateView(generics.CreateAPIView):
         for product_id, update in stock_update.items():
             serializer.update_stock(product_id, update["stock"], update["sold"])
 
+        CouponPivot.objects.filter(cart=cart).delete()
         user.cart.products_in_cart.set([])
 
         serializer.save(order=order)
