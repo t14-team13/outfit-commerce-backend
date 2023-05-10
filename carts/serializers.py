@@ -24,13 +24,10 @@ class CartPivotSerializer(serializers.ModelSerializer):
 class CartProductsSerializer(serializers.ModelSerializer):
     products = serializers.SerializerMethodField()
     amount = serializers.SerializerMethodField()
-    # coupons = serializers.SerializerMethodField()
     coupons_used = CouponReturnSerializer(many=True, read_only=True)
     total_price = serializers.SerializerMethodField()
 
     def sum_amount_or_price(self, obj):
-        user = self.context.get("request").user
-
         products = Product.objects.filter(cart=obj)
         coupon = CouponPivot.objects.filter(cart=obj)
 
@@ -38,7 +35,7 @@ class CartProductsSerializer(serializers.ModelSerializer):
         price = 0
         discount = 0
 
-        for i, value in enumerate(products):
+        for _, value in enumerate(products):
             amount += 1
             price += value.price
 
